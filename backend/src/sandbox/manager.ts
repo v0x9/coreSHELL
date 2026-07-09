@@ -25,6 +25,11 @@ class SandboxManager {
             AttachStderr: true,
 
             Cmd: ["python3", "main.py"],
+            
+            HostConfig: {
+                Memory: 1024 * 1024 * 128, // 128MB RAM limit
+                NanoCPUs: 1000000000,      // 1 CPU Core limit
+            },
 
         });
         await container.start();

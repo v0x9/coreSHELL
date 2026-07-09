@@ -1,6 +1,7 @@
 import {Router} from "express";
 import AuthService from "../auth/auth.service.js";
-
+import { authMiddleware } from "../auth/middleware.js";
+import User from "../models/User.js";
 
 const router = Router();
 
@@ -24,6 +25,27 @@ router.post("/login", async (req, res) => {
         res.status(200).json({ token });
     } catch (error: any) {
         res.status(400).json({ error: error.message });
+    }
+});
+
+router.get("/me", authMiddleware, async (req, res) => {
+    try {
+        const userId = req.user?.userId;
+        if (!userId) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+        
+        const user = await User.findByPk(userId, {
+            attributes: { exclude: ['passwordHash'] }
+        });
+        
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        
+        res.status(200).json(user);
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
     }
 });
 

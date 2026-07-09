@@ -8,6 +8,9 @@ export async function socketMiddleware(socket: Socket, next: (err?: any) => void
 
     try {
         const payload = jwt.verifyToken(token);
+        if (!payload) {
+            return next(new Error("Invalid token"));
+        }
         socket.data.userId = payload.userId;
         next();
     } catch (err) {

@@ -12,6 +12,7 @@ import { connectRedis } from "./redis/client.js";
 import Reaper from "./sandbox/reaper.js";
 import { registerTerminal } from "./socket/terminal.js";
 import { connectToDatabase } from "./database/connection.js";
+import { socketMiddleware } from "./auth/socketMiddleware.js";
 
 import authRoutes from "./routes/auth.js";
 
@@ -43,6 +44,9 @@ const io = new Server(server ,{
         origin: "*"
     }
 });
+
+// Apply authentication middleware to sockets
+io.use(socketMiddleware);
 
 // Register terminal socket handlers
 registerTerminal(io);
