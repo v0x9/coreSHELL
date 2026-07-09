@@ -61,6 +61,20 @@ class SessionService {
             return stream;
         }
 
+        async resizeSession(sessionId: string, rows: number, cols: number) {
+            // Check Redis cache for fast container lookup
+            let containerId = await this.sessionCache.getContainer(sessionId);
+            
+            if (!containerId) {
+                const session = await this.getSession(sessionId);
+                if (!session) throw new Error("Session not found");
+                containerId = session.containerId;
+                await this.sessionCache.saveSession(sessionId, containerId);
+            }
+
+            await this.manager.resize(containerId, rows, cols);
+        }
+
         async updateActivity(sessionId: string){
             const session = await this.getSession(sessionId);
             if (!session) {

@@ -93,6 +93,17 @@ export function registerTerminal(io : Server){
             }
 
         });
+
+        socket.on("terminal_resize", async (data: { rows: number, cols: number }) => {
+            if (!session) return;
+            try {
+                const { rows, cols } = data;
+                await sessionService.resizeSession(session.id, rows, cols);
+            } catch (err) {
+                console.error("Failed to resize terminal:", err);
+            }
+        });
+
         //set status to paused when user disconnects
         socket.on("disconnect", async () => {
             if (session) {
