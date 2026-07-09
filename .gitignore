@@ -1,4 +1,6 @@
 /backend/node_modules/
+/nodde_modules/
+/shell/node_modules/
 dist/
 .env
 *.log
