@@ -17,9 +17,10 @@ const Blob = () => {
 
   const getThemeColors = () => {
     switch (theme) {
-      case 'matrix': return { color: '#00ff41', bg: '#000000' };
-      case 'cyberpunk': return { color: '#ff00ff', bg: '#0a0a2a' };
+      case 'matrix': return { color: '#00ff41', bg: '#001a0f' };
+      case 'light': return { color: '#ff00ff', bg: '#f4f5f7' };
       case 'vaporwave': return { color: '#00ffff', bg: '#ffb3ba' };
+      case 'cartoon': return { color: '#ea1266', bg: '#698791' };
       case 'dark': 
       default: return { color: '#4a4a6a', bg: '#0f0f13' };
     }
@@ -38,8 +39,10 @@ const Blob = () => {
           attach="material"
           distort={0.4} // Shape distortion
           speed={1.5}   // Animation speed
-          roughness={0.2}
-          metalness={0.8}
+          roughness={theme === 'cartoon' ? 1 : 0.2}
+          metalness={theme === 'cartoon' ? 0 : 0.8}
+          wireframe={theme === 'matrix'}
+          flatShading={theme === 'cartoon'}
         />
       </Sphere>
       {/* Second smaller blob for depth */}
@@ -49,8 +52,10 @@ const Blob = () => {
           attach="material"
           distort={0.6}
           speed={2}
-          roughness={0.3}
-          metalness={0.9}
+          roughness={theme === 'cartoon' ? 1 : 0.3}
+          metalness={theme === 'cartoon' ? 0 : 0.9}
+          wireframe={theme === 'matrix'}
+          flatShading={theme === 'cartoon'}
         />
       </Sphere>
       <Environment preset="city" />

@@ -1,9 +1,10 @@
 import { Server , Socket } from "socket.io";
 import SandboxManager from "../sandbox/manager.js";
+import SessionService from "../services/SessionService.js";
+import { SessionStatus } from "../types/session.js";
+import {Session} from "../models/index.js";
 
-
-const manager = new SandboxManager();
-
+const sessionService = new SessionService();
 
 
 export function registerTerminal(io : Server){
@@ -11,30 +12,40 @@ export function registerTerminal(io : Server){
 
     io.on("connection" , (socket : Socket)=>{
         let stream  : NodeJS.ReadWriteStream | null = null;
+        let sessionService = new SessionService();
+        let session : Session | null = null;
         console.log(`Client connected ${socket.id}`);
         
         socket.on("start_terminal" , async (data : {userId : string})=>{
             const {userId} = data;
             try{
-
-                const containerId = await manager.createContainer();
-                socket.emit("terminal_started" , {containerId : containerId});
+                
+                session = await sessionService.createSession(userId);
+               
+                socket.emit("terminal_started" , {sessionId : session.id});
             }catch(err){
                 console.error(err);
                 socket.emit("terminal_error" , {message : "Failed to start terminal"});
             }
         });
 
-        socket.on("attach_terminal" , async (data : {containerId : string})=>{
-            const {containerId} = data;
+        socket.on("attach_terminal" , async (data : {sessionId : string})=>{
+            const {sessionId} = data;
             try{
+                session = await sessionService.getSession(sessionId);
+                if (!session) {
+                    socket.emit("terminal_error", {
+                        message: "Session not found",
+                    });
+                    return;
+                }
                 if (stream) {
                     socket.emit("terminal_error", {
                         message: "Terminal already attached",
                     });
                     return;
                 }
-                stream = await manager.attach(containerId);
+                stream = await sessionService.attachSession(sessionId);
                 stream.on("data", (output: Buffer) => {
                 socket.emit("terminal_output", {
                     output: output.toString(),
@@ -70,7 +81,7 @@ export function registerTerminal(io : Server){
                         message: "Terminal not attached",
                     });
                     return;
-}
+}               await sessionService.updateActivity(session.id);
                 stream.write(input);
             }catch(err){
                 console.error(err);
@@ -78,18 +89,14 @@ export function registerTerminal(io : Server){
             }
 
         });
-
+        //set status to paused when user disconnects
         socket.on("disconnect", () => {
 
+            
+
+            await sessionService.setStatus(session.id, SessionStatus.PAUSED);
+
             console.log(`Disconnected ${socket.id}`);
-
-            if (stream) {
-
-                stream.removeAllListeners();
-
-                stream = null;
-
-            }
 
         });
 

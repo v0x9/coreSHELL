@@ -8,11 +8,12 @@ export const ThemeSelector: React.FC = () => {
   const { theme, setTheme } = useThemeStore();
   const [isOpen, setIsOpen] = useState(false);
 
-  const themes: { id: ThemeName; name: string; color: string }[] = [
-    { id: 'dark', name: 'Dark Mode', color: '#4a4a6a' },
-    { id: 'matrix', name: 'Matrix', color: '#00ff41' },
-    { id: 'cyberpunk', name: 'Cyberpunk', color: '#ff00ff' },
-    { id: 'vaporwave', name: 'Vaporwave', color: '#00ffff' },
+  const themes: { id: ThemeName; name: string; color1: string; color2: string }[] = [
+    { id: 'dark', name: 'Dark Mode', color1: '#ffffff', color2: '#e0e0e0' },
+    { id: 'matrix', name: 'White / Green', color1: '#ffffff', color2: '#00ff41' },
+    { id: 'light', name: 'Light Mode', color1: '#333333', color2: '#ff00ff' },
+    { id: 'vaporwave', name: 'Pink / Cyan', color1: '#ffb3ba', color2: '#00ffff' },
+    { id: 'cartoon', name: 'White / Magenta', color1: '#ffffff', color2: '#ea1266' },
   ];
 
   if (!isOpen) {
@@ -89,7 +90,7 @@ export const ThemeSelector: React.FC = () => {
                 style={{
                   padding: '12px 8px',
                   borderRadius: '8px',
-                  border: `1px solid ${theme === t.id ? t.color : 'rgba(255,255,255,0.1)'}`,
+                  border: `1px solid ${theme === t.id ? t.color2 : 'rgba(255,255,255,0.1)'}`,
                   background: 'rgba(0,0,0,0.2)',
                   cursor: 'pointer',
                   display: 'flex',
@@ -98,7 +99,13 @@ export const ThemeSelector: React.FC = () => {
                   transition: 'all 0.2s'
                 }}
               >
-                <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: t.color }}></div>
+                <div style={{
+                  width: '16px',
+                  height: '16px',
+                  borderRadius: '50%',
+                  background: `linear-gradient(135deg, ${t.color1} 50%, ${t.color2} 50%)`,
+                  border: '1px solid rgba(255,255,255,0.2)'
+                }}></div>
                 <span style={{ fontSize: '14px' }}>{t.name}</span>
               </div>
             ))}

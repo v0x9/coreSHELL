@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type ThemeName = 'dark' | 'cyberpunk' | 'matrix' | 'vaporwave';
+export type ThemeName = 'dark' | 'light' | 'matrix' | 'vaporwave' | 'cartoon';
 
 interface ThemeState {
   theme: ThemeName;

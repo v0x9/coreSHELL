@@ -14,17 +14,30 @@ export const TerminalContent: React.FC = () => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [history]);
 
-  const getTextColor = () => {
+  const getOutputColor = () => {
     switch (theme) {
       case 'matrix': return '#00ff41';
-      case 'cyberpunk': return '#ff00ff';
+      case 'light': return '#ff00ff';
       case 'vaporwave': return '#00ffff';
+      case 'cartoon': return '#ea1266';
       case 'dark':
       default: return '#e0e0e0';
     }
   };
 
-  const textColor = getTextColor();
+  const getInputColor = () => {
+    switch (theme) {
+      case 'matrix': return '#ffffff';
+      case 'light': return '#333333';
+      case 'vaporwave': return '#ffb3ba';
+      case 'cartoon': return '#ffffff';
+      case 'dark':
+      default: return '#ffffff';
+    }
+  };
+
+  const outputColor = getOutputColor();
+  const inputColor = getInputColor();
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -54,36 +67,43 @@ export const TerminalContent: React.FC = () => {
 
   const containerStyle: React.CSSProperties = {
     fontFamily: 'monospace',
-    color: textColor,
     fontSize: '15px',
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
-    textShadow: theme !== 'dark' ? `0 0 5px ${textColor}` : 'none',
   };
 
   const inputRowStyle: React.CSSProperties = {
     display: 'flex',
     marginTop: '8px',
+    color: inputColor,
   };
 
   const inputStyle: React.CSSProperties = {
     background: 'transparent',
     border: 'none',
-    color: textColor,
+    color: inputColor,
     fontFamily: 'monospace',
     fontSize: '15px',
     outline: 'none',
     flex: 1,
     marginLeft: '8px',
-    textShadow: theme !== 'dark' ? `0 0 5px ${textColor}` : 'none',
+  };
+
+  const getLineStyle = (type: string): React.CSSProperties => {
+    const color = type === 'input' ? inputColor : outputColor;
+    return {
+      marginBottom: '4px',
+      color: color,
+      opacity: type === 'input' ? 0.9 : 1
+    };
   };
 
   return (
     <div style={containerStyle}>
       <div style={{ flex: 1, overflowY: 'auto', paddingBottom: '20px' }}>
         {history.map((line, i) => (
-          <div key={i} style={{ marginBottom: '4px', opacity: line.type === 'input' ? 0.7 : 1 }}>
+          <div key={i} style={getLineStyle(line.type)}>
             {line.text}
           </div>
         ))}

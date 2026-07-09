@@ -7,24 +7,27 @@ export const Navbar: React.FC = () => {
   const getThemeColor = () => {
     switch (theme) {
       case 'matrix': return '#00ff41';
-      case 'cyberpunk': return '#ff00ff';
+      case 'light': return '#ff00ff';
+      case 'cartoon': return '#ea1266';
       case 'vaporwave': return '#00ffff';
       case 'dark':
       default: return '#ffffff';
     }
   };
 
+  const isLight = theme === 'light';
+
   return (
     <div style={{
       height: '32px',
       width: '100vw',
-      background: 'rgba(15, 15, 19, 0.4)',
+      background: isLight ? 'rgba(255, 255, 255, 0.4)' : 'rgba(15, 15, 19, 0.4)',
       backdropFilter: 'blur(10px)',
-      borderBottom: '1px solid rgba(255,255,255,0.05)',
+      borderBottom: `1px solid ${isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`,
       display: 'flex',
       alignItems: 'center',
       padding: '0 20px',
-      color: 'white',
+      color: isLight ? '#333333' : 'white',
       fontSize: '13px',
       fontFamily: 'Inter, sans-serif',
       position: 'absolute',
@@ -34,7 +37,7 @@ export const Navbar: React.FC = () => {
       userSelect: 'none'
     }}>
       <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-        <div style={{ fontWeight: 'bold', color: getThemeColor(), textShadow: `0 0 10px ${getThemeColor()}` }}>
+        <div style={{ fontWeight: 'bold', color: getThemeColor() }}>
           OCS
         </div>
         <div style={{ opacity: 0.8, cursor: 'pointer' }}>Terminal</div>
