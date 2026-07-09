@@ -13,7 +13,7 @@ import Reaper from "./sandbox/reaper.js";
 import { registerTerminal } from "./socket/terminal.js";
 import { connectToDatabase } from "./database/connection.js";
 
-
+import authRoutes from "./routes/auth.js";
 
 const app = express();
 
@@ -30,6 +30,7 @@ app.get("/health" , (req , res)=>{
         message:"coreSHell backend is running"
     });
 });
+app.use("/auth" , authRoutes);
 
 //creating a http server
 
@@ -53,6 +54,8 @@ async function startServer() {
 
     // 2. Connect to Redis
     await connectRedis();
+
+    
 
     // 3. Initialize the single global Reaper for all users
     const reaper = new Reaper();
