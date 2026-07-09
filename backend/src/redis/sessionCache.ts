@@ -1,17 +1,37 @@
 import { Session } from "../models/index.js";
-class SessionCache {
-    private
 
-    saveSession(session: Session){
+import client from "./client.js";
+
+class SessionCache {
+    
+
+    async saveSession(sessionId: string, containerId: string) {
+        await client.set(`session:${sessionId}`, containerId);
 
     }
 
-    getContainer()
+    async getContainer(sessionId: string) {
+        return await client.get(`session:${sessionId}`);
+    }
 
-    markDisconnected()
+    async markDisconnected(sessionId: string) {
+        await client.expire(`session:${sessionId}`, 60 * 10); // expire in 10 minutes
+    }
 
-    cancelDisconnect()
+    async cancelDisconnect(sessionId: string) {
+        await client.persist(`session:${sessionId}`);
+    }
 
-    removeSession()
+    async removeSession(sessionId: string) {
+        await client.del(`session:${sessionId}`);
+    }
+    async hasSession(sessionId: string) {
+
+        return await client.exists(
+            `session:${sessionId}`
+        );
+
+    }
 
 }
+export default SessionCache ;

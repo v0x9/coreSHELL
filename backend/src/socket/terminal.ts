@@ -46,6 +46,10 @@ export function registerTerminal(io : Server){
                     return;
                 }
                 stream = await sessionService.attachSession(sessionId);
+                
+                // Cancel any pending disconnect since the user reattached
+                await sessionService.cancelDisconnect(sessionId);
+                
                 stream.on("data", (output: Buffer) => {
                 socket.emit("terminal_output", {
                     output: output.toString(),
@@ -90,16 +94,16 @@ export function registerTerminal(io : Server){
 
         });
         //set status to paused when user disconnects
-        socket.on("disconnect", () => {
+        socket.on("disconnect", async () => {
+            if (session) {
+                await sessionService.setStatus(session.id, SessionStatus.PAUSED);
+                
+                // Start the 600 seconds counter in Redis
+                await sessionService.markDisconnected(session.id);
 
-            
-
-            await sessionService.setStatus(session.id, SessionStatus.PAUSED);
-
-            console.log(`Disconnected ${socket.id}`);
-
+                console.log(`Disconnected ${socket.id}`);
+            }
         });
-
         
-    
-    })};       
+    });
+}       
