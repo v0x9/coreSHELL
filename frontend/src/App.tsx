@@ -1,23 +1,15 @@
-import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { AuthPage } from './pages/AuthPage';
+import { DashboardPage } from './pages/DashboardPage';
 import './App.css';
-import { Background } from './components/Background';
-import { TerminalWindow } from './components/TerminalWindow';
-import { TerminalContent } from './components/TerminalContent';
-import { Navbar } from './components/Navbar';
-import { ThemeSelector } from './components/ThemeSelector';
-
+import ProtectedRoutes from './components/ProtectedRoutes';
 function App() {
   return (
-    <div className="app-container">
-      <Background />
-      <Navbar />
-      
-      <TerminalWindow>
-        <TerminalContent />
-      </TerminalWindow>
-      
-      <ThemeSelector />
-    </div>
+    <Routes>
+      <Route path="/" element={<Navigate to="/auth" replace />} />
+      <Route path="/auth" element={<AuthPage />} />
+      <Route path="/dashboard" element={<ProtectedRoutes><DashboardPage /></ProtectedRoutes>} />
+    </Routes>
   );
 }
 

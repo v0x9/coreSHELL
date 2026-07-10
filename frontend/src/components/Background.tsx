@@ -4,14 +4,18 @@ import { MeshDistortMaterial, Sphere, Environment } from '@react-three/drei';
 import { useThemeStore } from '../stores/themeStore';
 import * as THREE from 'three';
 
-const Blob = () => {
+interface BlobProps {
+  isAuth?: boolean;
+}
+
+const Blob: React.FC<BlobProps> = ({ isAuth }) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const theme = useThemeStore((state) => state.theme);
 
   useFrame((state) => {
     if (meshRef.current) {
-      meshRef.current.rotation.x = state.clock.getElapsedTime() * 0.2;
-      meshRef.current.rotation.y = state.clock.getElapsedTime() * 0.3;
+      meshRef.current.rotation.x = state.clock.getElapsedTime() * (isAuth ? 0.05 : 0.2);
+      meshRef.current.rotation.y = state.clock.getElapsedTime() * (isAuth ? 0.08 : 0.3);
     }
   });
 
@@ -37,8 +41,8 @@ const Blob = () => {
         <MeshDistortMaterial
           color={colors.color}
           attach="material"
-          distort={0.4} // Shape distortion
-          speed={1.5}   // Animation speed
+          distort={isAuth ? 0.2 : 0.4} // Calmer shape distortion
+          speed={isAuth ? 0.4 : 1.5}   // Slower animation speed
           roughness={theme === 'cartoon' ? 1 : 0.2}
           metalness={theme === 'cartoon' ? 0 : 0.8}
           wireframe={theme === 'matrix'}
@@ -46,12 +50,12 @@ const Blob = () => {
         />
       </Sphere>
       {/* Second smaller blob for depth */}
-      <Sphere args={[1, 64, 64]} scale={1.5} position={[4, 2, -5]}>
+      <Sphere args={[1, 64, 64]} scale={isAuth ? 1.2 : 1.5} position={isAuth ? [3, 1, -6] : [4, 2, -5]}>
         <MeshDistortMaterial
           color={colors.color}
           attach="material"
-          distort={0.6}
-          speed={2}
+          distort={isAuth ? 0.15 : 0.6}
+          speed={isAuth ? 0.3 : 2}
           roughness={theme === 'cartoon' ? 1 : 0.3}
           metalness={theme === 'cartoon' ? 0 : 0.9}
           wireframe={theme === 'matrix'}
@@ -63,11 +67,11 @@ const Blob = () => {
   );
 };
 
-export const Background = () => {
+export const Background: React.FC<{ isAuth?: boolean }> = ({ isAuth }) => {
   return (
     <div style={{ position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: -1 }}>
       <Canvas camera={{ position: [0, 0, 5] }}>
-        <Blob />
+        <Blob isAuth={isAuth} />
       </Canvas>
     </div>
   );
