@@ -26,6 +26,7 @@ class Reaper {
                 // The message will be the exact key name that expired (e.g. "session:123-456")
                 if (message.startsWith("session:")) {
                     const sessionId = message.split(":")[1];
+                    if (!sessionId) return;
                     console.log(`[Reaper] Redis timeout reached. Reaping session: ${sessionId}`);
                     
                     try {

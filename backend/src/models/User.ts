@@ -4,7 +4,12 @@ import { DataTypes , Model } from "sequelize";
 import {sequelize , connectToDatabase} from "../database/connection.js"
 
 
-class User extends Model {}
+class User extends Model {
+    declare id: string;
+    declare username: string;
+    declare email: string;
+    declare passwordHash: string;
+}
 
 User.init({
     id : {

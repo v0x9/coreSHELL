@@ -14,10 +14,8 @@ export function registerTerminal(io: Server) {
         let sessionService = new SessionService();
         let session: Session | null = null;
         console.log(`Client connected ${socket.id}`);
-        io.use(socketMiddleware);
-        registerTerminal(io);
         socket.on("start_terminal", async () => {
-            const { userId } = socket.data.user.userId ;
+            const userId = socket.data.user.userId ;
             try {
 
                 session = await sessionService.createSession(userId);
@@ -82,12 +80,13 @@ export function registerTerminal(io: Server) {
         socket.on("terminal_input", async (data: { input: string }) => {
             const { input } = data;
             try {
-                if (!stream) {
+                if (!stream || !session) {
                     socket.emit("terminal_error", {
                         message: "Terminal not attached",
                     });
                     return;
-                } await sessionService.updateActivity(session.id);
+                } 
+                await sessionService.updateActivity(session.id);
                 stream.write(input);
             } catch (err) {
                 console.error(err);

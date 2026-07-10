@@ -7,7 +7,14 @@ import {sequelize , connectToDatabase} from "../database/connection.js"
 import { SessionStatus } from "../types/session.js"
 
 
-class Session extends Model {}
+class Session extends Model {
+    declare id: string;
+    declare userId: string;
+    declare containerId: string;
+    declare status: SessionStatus;
+    declare lastActivity: Date;
+    declare endedAt: Date | null;
+}
 
 Session.init({
     id : {

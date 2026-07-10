@@ -108,7 +108,7 @@ class SessionService {
                 throw new Error("Session not found");
             }
             await this.manager.stop(session.containerId);
-            await this.setStatus(sessionId, SessionStatus.STOPPED);
+            await this.setStatus(sessionId, SessionStatus.TERMINATED);
             // Clear from Redis since the session is stopped
             await this.sessionCache.removeSession(sessionId);
         }
