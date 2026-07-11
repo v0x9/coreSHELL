@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Terminal, Lock, User, ArrowRight, Code } from 'lucide-react';
 import { Background } from '../components/Background';
@@ -16,12 +16,21 @@ export const AuthPage: React.FC = () => {
 
   const { user, token, isAuthenticated, loading, login, register, logout, checkAuth } = useAuthStore();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     // Navigate to dashboard for now since we're just designing the UI
     try{
       if (!isLogin) {
-        await register(username, email, password);
+        const success = await register(username, email, password);
+        if (success) {
+          navigate('/dashboard');
+        }
       } else {
         const success = await login(email, password);
         if (success) {

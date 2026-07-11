@@ -1,7 +1,7 @@
 import os
 import sys
 from core.utils import find_in_path
-from builtins.commands import echo, type_cmd
+from builtin_cmds.commands import echo, type_cmd
 
 def run_pipe(cmd1):
     prev_read = None # store the old command stdout to route to current pipe write

@@ -11,11 +11,12 @@ export function registerTerminal(io: Server) {
 
     io.on("connection", (socket: Socket) => {
         let stream: NodeJS.ReadWriteStream | null = null;
+        let attaching = false;
         let sessionService = new SessionService();
         let session: Session | null = null;
         console.log(`Client connected ${socket.id}`);
         socket.on("start_terminal", async () => {
-            const userId = socket.data.user.userId ;
+            const userId = socket.data.userId ;
             try {
 
                 session = await sessionService.createSession(userId);
@@ -37,12 +38,13 @@ export function registerTerminal(io: Server) {
                     });
                     return;
                 }
-                if (stream) {
+                if (stream || attaching) {
                     socket.emit("terminal_error", {
-                        message: "Terminal already attached",
+                        message: "Terminal already attached or attaching",
                     });
                     return;
                 }
+                attaching = true;
                 stream = await sessionService.attachSession(sessionId);
 
                 // Cancel any pending disconnect since the user reattached
@@ -74,6 +76,8 @@ export function registerTerminal(io: Server) {
             } catch (err) {
                 console.error(err);
                 socket.emit("terminal_error", { message: "Failed to attach terminal" });
+            } finally {
+                attaching = false;
             }
         });
 

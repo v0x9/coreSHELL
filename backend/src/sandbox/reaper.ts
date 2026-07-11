@@ -11,6 +11,7 @@ class Reaper {
         this.subscriber = createClient({
             url: process.env.REDIS_URL || "redis://localhost:6379",
         });
+        this.subscriber.on("error", (err) => console.log("Redis Subscriber Error", err));
         this.sessionService = new SessionService();
     }
 
@@ -19,7 +20,11 @@ class Reaper {
             await this.subscriber.connect();
             
             // Tell Redis to enable keyspace notifications for expired keys ("E" = keyevent, "x" = expired)
-            await client.configSet("notify-keyspace-events", "Ex");
+            try {
+                await client.configSet("notify-keyspace-events", "Ex");
+            } catch (err) {
+                console.warn("[Reaper] Could not set notify-keyspace-events via command. Please ensure it is enabled in your Aiven Redis dashboard.");
+            }
 
             // Subscribe to the expiration channel (0 is the default database)
             await this.subscriber.subscribe("__keyevent@0__:expired", async (message: string) => {

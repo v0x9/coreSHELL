@@ -11,9 +11,9 @@ interface AuthState {
 
     isAuthenticated : boolean;
 
-    login : (username: string, password: string) => Promise<boolean>;
+    login : (email: string, password: string) => Promise<boolean>;
 
-    register : (username: string, email: string, password: string) => Promise<void>;
+    register : (username: string, email: string, password: string) => Promise<boolean>;
     
     logout : () => void;
 
@@ -26,17 +26,17 @@ export const useAuthStore = create<AuthState>((set) => ({
         
     user: null,
 
-    token: null,
+    token: localStorage.getItem('token'),
 
-    loading: false,
+    loading: !!localStorage.getItem('token'),
 
     isAuthenticated: false,
 
 
-    login : async (username: string, password: string) => {
+    login : async (email: string, password: string) => {
         set({ loading: true });
         try {
-            const response = await login(username, password);
+            const response = await login(email, password);
             set({ user: response.user, token: response.token, isAuthenticated: true });
             localStorage.setItem('token', response.token);
             localStorage.setItem('user', JSON.stringify(response.user));
@@ -60,9 +60,11 @@ export const useAuthStore = create<AuthState>((set) => ({
 
             localStorage.setItem('token', response.token);
             localStorage.setItem('user', JSON.stringify(response.user));
+            return true;
         } catch (error) {
             console.error('Registration failed:', error);
             set({ user: null, token: null, isAuthenticated: false });
+            return false;
         } finally {
             set({ loading: false });
         }

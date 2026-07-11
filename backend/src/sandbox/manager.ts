@@ -24,7 +24,7 @@ class SandboxManager {
 
             AttachStderr: true,
 
-            Cmd: ["python3", "main.py"],
+            Cmd: ["/bin/bash", "-c", "stty -echo && python3 -u main.py"],
             
             HostConfig: {
                 Memory: 1024 * 1024 * 128, // 128MB RAM limit

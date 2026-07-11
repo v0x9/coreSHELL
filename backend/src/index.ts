@@ -3,11 +3,11 @@
 
 import express from "express";
 import http from "http";
-import {Server} from "socket.io";
+import { Server } from "socket.io";
 import cors from "cors";
 import dotenv from "dotenv";
 
-import {config} from "./config.js"
+import { config } from "./config.js"
 import { connectRedis } from "./redis/client.js";
 import Reaper from "./sandbox/reaper.js";
 import { registerTerminal } from "./socket/terminal.js";
@@ -25,13 +25,13 @@ app.use(express.json());
 
 //health check 
 
-app.get("/health" , (req , res)=>{
+app.get("/health", (req, res) => {
     res.status(200).json({
-        status:"OK" , 
-        message:"coreSHell backend is running"
+        status: "OK",
+        message: "coreSHell backend is running"
     });
 });
-app.use("/auth" , authRoutes);
+app.use("/api/auth", authRoutes);
 
 //creating a http server
 
@@ -39,8 +39,8 @@ const server = http.createServer(app);
 
 //attaching socket io
 
-const io = new Server(server ,{
-    cors:{
+const io = new Server(server, {
+    cors: {
         origin: "*"
     }
 });
@@ -59,14 +59,14 @@ async function startServer() {
     // 2. Connect to Redis
     await connectRedis();
 
-    
+
 
     // 3. Initialize the single global Reaper for all users
     const reaper = new Reaper();
     await reaper.start();
 
     // 3. Start the HTTP server
-    server.listen(PORT , ()=>{
+    server.listen(PORT, () => {
         console.log(`Server listening on port ${PORT}`)
     });
 }

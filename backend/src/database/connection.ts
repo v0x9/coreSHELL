@@ -1,9 +1,13 @@
-// Empty file for user implementation
-const Sequelize = require('sequelize')
-const {config} = require('../config.js')
+import { Sequelize } from 'sequelize';
+import { config } from '../config.js';
 
+// Strip out sslmode from Aiven URL if present so our dialectOptions apply safely
+let dbUrl = config.databaseUrl;
+if (dbUrl.includes('?')) {
+    dbUrl = dbUrl.split('?')[0];
+}
 
-export const sequelize = new Sequelize(config.databaseUrl , {
+export const sequelize = new Sequelize(dbUrl , {
     dialectOptions : {
         ssl : {
             require : true, 
@@ -18,12 +22,12 @@ export const connectToDatabase = async () =>{
         await sequelize.authenticate()
         console.log('Connected to database')
         
-        // Sync models with the database
-        await sequelize.sync({ alter: true });
+        // Sync models with the database safely (without altering to prevent cache bugs)
+        await sequelize.sync();
         console.log('Database synchronized');
 
     } catch (err) {
-        console.log('failed to connect to the database')
+        console.error('Failed to connect to the database:', err)
         return process.exit(1)
     }
 };

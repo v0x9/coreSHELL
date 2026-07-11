@@ -14,8 +14,9 @@ const Blob: React.FC<BlobProps> = ({ isAuth }) => {
 
   useFrame((state) => {
     if (meshRef.current) {
-      meshRef.current.rotation.x = state.clock.getElapsedTime() * (isAuth ? 0.05 : 0.2);
-      meshRef.current.rotation.y = state.clock.getElapsedTime() * (isAuth ? 0.08 : 0.3);
+      const elapsedTime = performance.now() / 1000;
+      meshRef.current.rotation.x = elapsedTime * (isAuth ? 0.05 : 0.2);
+      meshRef.current.rotation.y = elapsedTime * (isAuth ? 0.08 : 0.3);
     }
   });
 

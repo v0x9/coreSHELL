@@ -1,10 +1,10 @@
-export async function login(username: string, password: string) {
-    const response = await fetch('/auth/login', {
+export async function login(email: string, password: string) {
+    const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ email, password })
     });
     if (!response.ok) {
         throw new Error('Login failed');
@@ -13,7 +13,7 @@ export async function login(username: string, password: string) {
 }
 
 export async function register(username: string, email: string, password: string) {
-    const response = await fetch('/auth/register', {
+    const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -28,10 +28,11 @@ export async function register(username: string, email: string, password: string
 
 //only send back user ,since rest already with the user
 export async function me() {
-    const response = await fetch('/auth/me', {
+    const response = await fetch('/api/auth/me', {
         method: 'GET',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
     });
     if (!response.ok) {

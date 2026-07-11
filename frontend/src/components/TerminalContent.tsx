@@ -1,14 +1,56 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useThemeStore } from '../stores/themeStore';
+import { useTerminalState } from '../stores/terminalStore';
 
 export const TerminalContent: React.FC = () => {
   const theme = useThemeStore((state) => state.theme);
+  const terminalStore = useTerminalState();
   const [input, setInput] = useState('');
-  const [history, setHistory] = useState([
-    { type: 'output', text: 'Welcome to coreSHell v2.0' },
-    { type: 'output', text: 'Type "help" for a list of commands.' }
-  ]);
+  const history = useTerminalState((state) => state.history);
+  const pushHistory = useTerminalState((state) => state.pushHistory);
+  const clearHistory = useTerminalState((state) => state.clearHistory);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  // Initialize backend connection
+  useEffect(() => {
+    let checkSession: NodeJS.Timeout;
+    
+    const setupTerminal = async () => {
+      try {
+        if (!terminalStore.connected) {
+          await terminalStore.connect();
+        }
+        if (!terminalStore.sessionId) {
+          await terminalStore.startTerminal();
+        }
+        
+        checkSession = setInterval(() => {
+          if (useTerminalState.getState().sessionId) {
+            clearInterval(checkSession);
+            useTerminalState.getState().attach((output) => {
+              // Append incoming output from backend to our custom UI
+              pushHistory({ type: 'output', text: output });
+            });
+            // Only add "Connected successfully" if we didn't just restore a long session
+            const currentHistory = useTerminalState.getState().history;
+            if (currentHistory.length <= 2) {
+               pushHistory({ type: 'output', text: 'Connected successfully.' });
+            }
+          }
+        }, 100);
+      } catch (err) {
+        pushHistory({ type: 'output', text: `Connection error: ${err}` });
+      }
+    };
+
+    setupTerminal();
+
+    return () => {
+      if (checkSession) clearInterval(checkSession);
+      // We don't disconnect the socket on unmount here to avoid React Strict Mode 
+      // instantly killing the connection on its test mount/unmount cycle.
+    };
+  }, []); // Run once on mount
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -43,24 +85,12 @@ export const TerminalContent: React.FC = () => {
     if (e.key === 'Enter') {
       if (!input.trim()) return;
       
-      const newHistory = [...history, { type: 'input', text: `> ${input}` }];
+      // Add user input to local history visually (it will render in inputColor)
+      pushHistory({ type: 'input', text: `> ${input}` });
       
-      // Simple mock commands
-      if (input === 'help') {
-        newHistory.push({ type: 'output', text: 'Available commands: help, clear, echo, date' });
-      } else if (input === 'clear') {
-        setHistory([]);
-        setInput('');
-        return;
-      } else if (input === 'date') {
-        newHistory.push({ type: 'output', text: new Date().toString() });
-      } else if (input.startsWith('echo ')) {
-        newHistory.push({ type: 'output', text: input.substring(5) });
-      } else {
-        newHistory.push({ type: 'output', text: `Command not found: ${input}` });
-      }
+      // Send it to the backend via sockets
+      terminalStore.sendInput(input + '\n');
       
-      setHistory(newHistory);
       setInput('');
     }
   };
@@ -95,13 +125,15 @@ export const TerminalContent: React.FC = () => {
     return {
       marginBottom: '4px',
       color: color,
-      opacity: type === 'input' ? 0.9 : 1
+      opacity: type === 'input' ? 0.9 : 1,
+      whiteSpace: 'pre-wrap',
+      wordBreak: 'break-all'
     };
   };
 
   return (
     <div style={containerStyle}>
-      <div style={{ flex: 1, overflowY: 'auto', paddingBottom: '20px' }}>
+      <div className={`terminal-scroll-container theme-${theme}`} style={{ flex: 1, overflowY: 'auto', paddingBottom: '20px' }}>
         {history.map((line, i) => (
           <div key={i} style={getLineStyle(line.type)}>
             {line.text}

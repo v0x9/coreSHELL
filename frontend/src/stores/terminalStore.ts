@@ -1,9 +1,8 @@
 import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 import {connect as connectSocket,disconnect as disconnectSocket ,getSocket , isConnected} from "../socket/socket"
 interface TerminalState {
 
-
-    containerId : string | null ;
 
     sessionId : string | null ;
 
@@ -13,7 +12,13 @@ interface TerminalState {
 
     startTerminal : () => Promise<void>;
 
-    attach : () => Promise<void>;
+    attach : (onData: (data: string) => void) => Promise<void>;
+
+    history: { type: string; text: string }[];
+
+    pushHistory: (item: { type: string; text: string }) => void;
+
+    clearHistory: () => void;
 
     sendInput : (input : string) => void ;
 
@@ -22,11 +27,22 @@ interface TerminalState {
 
 }
 
-export const useTerminalState = create<TerminalState>((set)=>({
-
-    containerId : null ,
+export const useTerminalState = create<TerminalState>()(
+  persist(
+    (set, get) => ({
 
     sessionId : null ,
+
+    connected : false ,
+
+    history: [
+      { type: 'output', text: 'Welcome to coreSHell v2.0' },
+      { type: 'output', text: 'Connecting to server...' }
+    ],
+
+    pushHistory: (item) => set((state) => ({ history: [...state.history, item] })),
+
+    clearHistory: () => set({ history: [] }),
 
     connected : false ,
 
@@ -58,30 +74,31 @@ export const useTerminalState = create<TerminalState>((set)=>({
         socket.once("terminal_started", (data) => {
 
             set({
-                containerId: data.containerId,
+                sessionId: data.sessionId,
             });
 
         });
     },
 
-    attach : async () =>{
+    attach : async (onData) =>{
         const socket = getSocket();
 
-        const containerId =
-            useTerminalState.getState().containerId;
+        const sessionId =
+            useTerminalState.getState().sessionId;
 
-        if (!containerId) {
-            throw new Error("No container");
+        if (!sessionId) {
+            throw new Error("No session");
         }
 
         socket.emit("attach_terminal", {
-            containerId,
+            sessionId,
         });
 
-        socket.once("terminal_output", (data) => {
-
-            console.log(data.output);
-
+        // Remove previous listeners to avoid duplicates
+        socket.off("terminal_output");
+        
+        socket.on("terminal_output", (data) => {
+            onData(data.output);
         });
 
         socket.once("terminal_exit", () => {
@@ -104,8 +121,6 @@ export const useTerminalState = create<TerminalState>((set)=>({
 
         set({
 
-            containerId: null,
-
             sessionId: null,
 
             connected: false,
@@ -113,4 +128,11 @@ export const useTerminalState = create<TerminalState>((set)=>({
         });
     }
     
-}));
+    }),
+    {
+      name: 'terminal-storage', // key in storage
+      storage: createJSONStorage(() => sessionStorage), // use sessionStorage
+      partialize: (state) => ({ history: state.history, sessionId: state.sessionId }), // only persist history and session ID
+    }
+  )
+);

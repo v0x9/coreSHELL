@@ -7,7 +7,7 @@ import readline
 from core.utils import find_in_path
 from core.completer import completer
 from core.executor import run_pipe
-from builtins.commands import echo, type_cmd
+from builtin_cmds.commands import echo, type_cmd
 
 def main():
     history = []
@@ -25,7 +25,7 @@ def main():
 
     while True:
         try:
-            command = input("$ ")
+            command = input("")
         except (EOFError, KeyboardInterrupt):
             print()
             continue
