@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      # These will be loaded from a .env file in the same directory
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - JWT_SECRET=${JWT_SECRET}
+    volumes:
+      # Required for the backend to spawn shell sandbox containers
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped

@@ -106,9 +106,9 @@ export const AuthPage: React.FC = () => {
             <span>or</span>
           </div>
 
-          <button type="button" className="github-btn">
+          <button type="button" className="github-btn" disabled style={{ opacity: 0.7, cursor: 'not-allowed' }}>
             <Code size={18} />
-            <span>Continue with Google</span>
+            <span>Continue with Google (Coming Soon)</span>
           </button>
 
           <div className="auth-footer">
