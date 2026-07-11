@@ -14,7 +14,7 @@ export const AuthPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const { user, token, isAuthenticated, loading, login, register, logout, checkAuth } = useAuthStore();
+  const { isAuthenticated, loading, login, register } = useAuthStore();
 
   useEffect(() => {
     if (isAuthenticated) {

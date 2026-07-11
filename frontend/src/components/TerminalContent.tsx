@@ -8,12 +8,12 @@ export const TerminalContent: React.FC = () => {
   const [input, setInput] = useState('');
   const history = useTerminalState((state) => state.history);
   const pushHistory = useTerminalState((state) => state.pushHistory);
-  const clearHistory = useTerminalState((state) => state.clearHistory);
+  // const clearHistory = useTerminalState((state) => state.clearHistory);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Initialize backend connection
   useEffect(() => {
-    let checkSession: NodeJS.Timeout;
+    let checkSession: ReturnType<typeof setTimeout>;
     
     const setupTerminal = async () => {
       try {

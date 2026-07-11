@@ -12,7 +12,7 @@ const Blob: React.FC<BlobProps> = ({ isAuth }) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const theme = useThemeStore((state) => state.theme);
 
-  useFrame((state) => {
+  useFrame(() => {
     if (meshRef.current) {
       const elapsedTime = performance.now() / 1000;
       meshRef.current.rotation.x = elapsedTime * (isAuth ? 0.05 : 0.2);

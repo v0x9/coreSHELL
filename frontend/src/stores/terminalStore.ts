@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import {connect as connectSocket,disconnect as disconnectSocket ,getSocket , isConnected} from "../socket/socket"
+import {connect as connectSocket,disconnect as disconnectSocket ,getSocket } from "../socket/socket"
 interface TerminalState {
 
 
@@ -29,7 +29,7 @@ interface TerminalState {
 
 export const useTerminalState = create<TerminalState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
 
     sessionId : null ,
 
@@ -44,7 +44,7 @@ export const useTerminalState = create<TerminalState>()(
 
     clearHistory: () => set({ history: [] }),
 
-    connected : false ,
+
 
     connect : async () =>{
 
