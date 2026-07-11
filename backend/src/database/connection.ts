@@ -4,7 +4,7 @@ import { config } from '../config.js';
 // Strip out sslmode from Aiven URL if present so our dialectOptions apply safely
 let dbUrl = config.databaseUrl;
 if (dbUrl.includes('?')) {
-    dbUrl = dbUrl.split('?')[0];
+    dbUrl = dbUrl.split('?')[0] as string;
 }
 
 export const sequelize = new Sequelize(dbUrl , {
