@@ -14,7 +14,7 @@ export const TerminalContent: React.FC = () => {
   // Initialize backend connection
   useEffect(() => {
     let checkSession: ReturnType<typeof setTimeout>;
-    
+
     const setupTerminal = async () => {
       try {
         if (!terminalStore.connected) {
@@ -23,7 +23,7 @@ export const TerminalContent: React.FC = () => {
         if (!terminalStore.sessionId) {
           await terminalStore.startTerminal();
         }
-        
+
         checkSession = setInterval(() => {
           if (useTerminalState.getState().sessionId) {
             clearInterval(checkSession);
@@ -34,7 +34,7 @@ export const TerminalContent: React.FC = () => {
             // Only add "Connected successfully" if we didn't just restore a long session
             const currentHistory = useTerminalState.getState().history;
             if (currentHistory.length <= 2) {
-               pushHistory({ type: 'output', text: 'Connected successfully.' });
+              pushHistory({ type: 'output', text: 'Connected successfully.' });
             }
           }
         }, 100);
@@ -84,13 +84,13 @@ export const TerminalContent: React.FC = () => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       if (!input.trim()) return;
-      
+
       // Add user input to local history visually (it will render in inputColor)
       pushHistory({ type: 'input', text: `> ${input}` });
-      
+
       // Send it to the backend via sockets
       terminalStore.sendInput(input + '\n');
-      
+
       setInput('');
     }
   };
