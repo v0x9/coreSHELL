@@ -20,7 +20,18 @@ const app = express();
 
 //Middleware
 
-app.use(cors());
+const allowedOrigins = [
+  "https://core-shell.vercel.app",
+  "https://coreshell.v0x9.space",
+  "http://localhost:5173" // Useful for local dev if needed
+];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 //health check 
@@ -48,7 +59,8 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: "*"
+        origin: allowedOrigins,
+        credentials: true
     }
 });
 
