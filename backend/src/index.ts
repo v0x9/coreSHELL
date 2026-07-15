@@ -25,6 +25,13 @@ app.use(express.json());
 
 //health check 
 
+app.get("/", (req, res) => {
+    res.status(200).json({
+        status: "OK",
+        message: "coreSHell root is running"
+    });
+});
+
 app.get("/health", (req, res) => {
     res.status(200).json({
         status: "OK",
