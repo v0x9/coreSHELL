@@ -72,11 +72,13 @@ export const useTerminalState = create<TerminalState>()(
         socket.emit("start_terminal");
 
         socket.once("terminal_started", (data) => {
-
             set({
                 sessionId: data.sessionId,
             });
+        });
 
+        socket.on("terminal_error", (data) => {
+            useTerminalState.getState().pushHistory({ type: 'output', text: `Error: ${data.message}` });
         });
     },
 
@@ -96,15 +98,18 @@ export const useTerminalState = create<TerminalState>()(
 
         // Remove previous listeners to avoid duplicates
         socket.off("terminal_output");
+        socket.off("terminal_error");
         
         socket.on("terminal_output", (data) => {
             onData(data.output);
         });
 
+        socket.on("terminal_error", (data) => {
+            useTerminalState.getState().pushHistory({ type: 'output', text: `Error: ${data.message}` });
+        });
+
         socket.once("terminal_exit", () => {
-
             console.log("Terminal exited");
-
         });
     },
 
