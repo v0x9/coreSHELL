@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://52.5.184.132';
+const API_URL = import.meta.env.VITE_API_URL || 'https://coreshell.v0x9.space';
 
 export async function login(email: string, password: string) {
     const response = await fetch(`${API_URL}/api/auth/login`, {
