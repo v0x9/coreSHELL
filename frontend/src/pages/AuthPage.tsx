@@ -13,6 +13,7 @@ export const AuthPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [emailError, setEmailError] = useState('');
 
   const { isAuthenticated, loading, login, register } = useAuthStore();
 
@@ -22,8 +23,19 @@ export const AuthPage: React.FC = () => {
     }
   }, [isAuthenticated, navigate]);
 
+  const validateEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
+    setEmailError('');
+
+    if (!validateEmail(email)) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+
     // Navigate to dashboard for now since we're just designing the UI
     try{
       if (!isLogin) {
@@ -77,8 +89,9 @@ export const AuthPage: React.FC = () => {
               <div className="input-icon">
                 <User size={18} />
               </div>
-              <input type="text" placeholder="Email " required className="glass-input" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <input type="email" placeholder="Email " required className="glass-input" value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
+            {emailError && <div style={{ color: '#ff6b6b', fontSize: '12px', marginTop: '-10px', marginBottom: '10px', marginLeft: '10px' }}>{emailError}</div>}
 
             <div className="input-group">
               <div className="input-icon">
