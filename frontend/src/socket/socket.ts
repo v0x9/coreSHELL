@@ -1,6 +1,6 @@
 import { io, Socket } from "socket.io-client";
 import { useAuthStore } from "../stores/authStore";
-const SOCKET_URL = import.meta.env.VITE_API_URL || "https://coreshell.v0x9.space";
+const SOCKET_URL = import.meta.env.VITE_API_URL || "http://52.5.184.132";
 
 let socket: Socket | null = null;
 
