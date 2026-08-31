@@ -20,9 +20,19 @@ class SessionService {
                 }
             });
             if (existingSession) {
-                // Refresh the cache if we are returning a paused session
-                await this.sessionCache.saveSession(existingSession.id, existingSession.containerId);
-                return existingSession;
+                try {
+                    const inspectData = await this.manager.inspect(existingSession.containerId);
+                    if (inspectData?.State?.Running) {
+                        // Refresh the cache if we are returning an active paused session
+                        await this.sessionCache.saveSession(existingSession.id, existingSession.containerId);
+                        return existingSession;
+                    }
+                } catch (e) {
+                    console.warn(`Paused container ${existingSession.containerId} no longer exists. Creating new session.`);
+                }
+                existingSession.status = SessionStatus.TERMINATED;
+                existingSession.endedAt = new Date();
+                await existingSession.save();
             }
             const containerId = await this.manager.createContainer();
 

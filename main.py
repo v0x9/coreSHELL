@@ -174,7 +174,9 @@ def main():
     while True:
         try:
             command = input("$ ")
-        except (EOFError, KeyboardInterrupt):
+        except EOFError:
+            break
+        except KeyboardInterrupt:
             print()
             continue
 

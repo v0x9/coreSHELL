@@ -14,7 +14,7 @@ WORKDIR /coreSHell
 
 COPY . .
 
-ENTRYPOINT ["python3", "main.py"]
+CMD ["python3", "main.py"]
 
 
 

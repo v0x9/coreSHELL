@@ -85,6 +85,11 @@ export const TerminalContent: React.FC = () => {
     if (e.key === 'Enter') {
       if (!input.trim()) return;
 
+      if (!terminalStore.sessionId) {
+        pushHistory({ type: 'output', text: 'Error: Terminal is not connected yet, please wait...' });
+        return;
+      }
+
       // Add user input to local history visually (it will render in inputColor)
       pushHistory({ type: 'input', text: `> ${input}` });
 
@@ -144,6 +149,7 @@ export const TerminalContent: React.FC = () => {
           <input
             type="text"
             value={input}
+            placeholder={terminalStore.sessionId ? "" : "Connecting..."}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             style={inputStyle}
