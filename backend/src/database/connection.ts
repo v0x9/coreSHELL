@@ -1,19 +1,22 @@
 import { Sequelize } from 'sequelize';
 import { config } from '../config.js';
 
-// Strip out sslmode from Aiven URL if present so our dialectOptions apply safely
-let dbUrl = config.databaseUrl;
+const rawUrl = config.databaseUrl || "postgres://coreshell:coreshell_secure_pass_2026@localhost:5432/coreshell";
+const requiresSsl = rawUrl.includes('sslmode=require') || process.env.DB_SSL === 'true';
+
+let dbUrl = rawUrl;
 if (dbUrl.includes('?')) {
     dbUrl = dbUrl.split('?')[0] as string;
 }
 
-export const sequelize = new Sequelize(dbUrl , {
-    dialectOptions : {
-        ssl : {
-            require : true, 
-            rejectUnauthorized : false
+export const sequelize = new Sequelize(dbUrl, {
+    dialectOptions: requiresSsl ? {
+        ssl: {
+            require: true,
+            rejectUnauthorized: false
         }
-    },
+    } : {},
+    logging: false
 });
 
 export const connectToDatabase = async () =>{

@@ -1,5 +1,5 @@
-import {create} from 'zustand';
-import { register  ,login, me} from '../api/auth';
+import { create } from 'zustand';
+import { register, login, loginDemo, me } from '../api/auth';
 
 interface AuthState {
 
@@ -12,6 +12,8 @@ interface AuthState {
     isAuthenticated : boolean;
 
     login : (email: string, password: string) => Promise<boolean>;
+
+    loginDemo : () => Promise<boolean>;
 
     register : (username: string, email: string, password: string) => Promise<boolean>;
     
@@ -50,6 +52,25 @@ export const useAuthStore = create<AuthState>((set) => ({
             set({ loading: false });
         }
         
+    },
+
+    loginDemo : async () => {
+        set({ loading: true });
+        try {
+            const response = await loginDemo();
+            set({ user: response.user, token: response.token, isAuthenticated: true });
+            localStorage.setItem('token', response.token);
+            if (response.user) {
+                localStorage.setItem('user', JSON.stringify(response.user));
+            }
+            return true;
+        } catch (error) {
+            console.error('Demo login failed:', error);
+            set({ user: null, token: null, isAuthenticated: false });
+            return false;
+        } finally {
+            set({ loading: false });
+        }
     },
 
     register : async (username: string, email: string, password: string) => {

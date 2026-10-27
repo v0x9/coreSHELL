@@ -214,25 +214,24 @@ npm run dev
 
 ## Production Deployment
 
-The backend runs on an **AWS EC2** instance behind an **Nginx reverse proxy** with Docker Compose. The frontend is deployed to **Vercel**.
+The backend runs on an **AWS EC2** instance with Docker Compose, featuring fully self-hosted **PostgreSQL 16** and **Redis 7** containers with persistent volumes behind an **Nginx reverse proxy**. The frontend is deployed to **Vercel**.
 
 ```bash
 # On the EC2 instance
 git clone https://github.com/v0x9/coreSHELL.git
 cd coreSHELL
 
-# Build the sandbox image
+# Build the sandbox shell container
 cd shell && docker build -t coreshell . && cd ..
 
-# Create production environment file
-nano .env
-
-# Deploy
+# Deploy (automatically boots PostgreSQL, Redis, Backend, and Nginx)
 docker compose -f docker-compose.prod.yml up -d --build
 
 # View logs
-docker compose -f docker-compose.prod.yml logs -f nginx backend
+docker compose -f docker-compose.prod.yml logs -f backend
 ```
+
+> **Evaluation / Recruiter Access**: A pre-seeded demo account is available out-of-the-box (`demo@coreshell.dev` / `coreshell_demo`) with a one-click login button on the authentication screen.
 
 ---
 

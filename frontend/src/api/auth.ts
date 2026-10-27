@@ -14,6 +14,20 @@ export async function login(email: string, password: string) {
     return response.json();
 }
 
+export async function loginDemo() {
+    const response = await fetch(`${API_URL}/api/auth/demo`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    if (!response.ok) {
+        // Fallback to standard login with demo credentials if endpoint fails
+        return login('demo@coreshell.dev', 'coreshell_demo');
+    }
+    return response.json();
+}
+
 export async function register(username: string, email: string, password: string) {
     const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',

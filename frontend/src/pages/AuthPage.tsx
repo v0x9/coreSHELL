@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Terminal, Lock, User, ArrowRight, Code } from 'lucide-react';
+import { Terminal, Lock, User, ArrowRight, Sparkles, KeyRound } from 'lucide-react';
 import { Background } from '../components/Background';
 import { Navbar } from '../components/Navbar';
 import './AuthPage.css';
@@ -15,7 +15,7 @@ export const AuthPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
 
-  const { isAuthenticated, loading, login, register } = useAuthStore();
+  const { isAuthenticated, loading, login, register, loginDemo } = useAuthStore();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -25,6 +25,17 @@ export const AuthPage: React.FC = () => {
 
   const validateEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const handleDemoLogin = async () => {
+    try {
+      const success = await loginDemo();
+      if (success) {
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      console.error('Demo login error:', err);
+    }
   };
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
@@ -116,13 +127,34 @@ export const AuthPage: React.FC = () => {
           </form>
 
           <div className="auth-divider">
-            <span>or</span>
+            <span>or for evaluation</span>
           </div>
 
-          <button type="button" className="github-btn" disabled style={{ opacity: 0.7, cursor: 'not-allowed' }}>
-            <Code size={18} />
-            <span>Continue with Google (Coming Soon)</span>
-          </button>
+          <div className="demo-access-card">
+            <div className="demo-badge">
+              <Sparkles size={13} color="#00ffff" />
+              <span>Interviewer & Recruiter Access</span>
+            </div>
+            <div className="demo-credentials">
+              <div className="demo-cred-row">
+                <span className="demo-cred-label">Email:</span>
+                <code>demo@coreshell.dev</code>
+              </div>
+              <div className="demo-cred-row">
+                <span className="demo-cred-label">Password:</span>
+                <code>coreshell_demo</code>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="demo-login-btn"
+              onClick={handleDemoLogin}
+              disabled={loading}
+            >
+              <KeyRound size={16} />
+              <span>One-Click Demo Login</span>
+            </button>
+          </div>
 
           <div className="auth-footer">
             <p>

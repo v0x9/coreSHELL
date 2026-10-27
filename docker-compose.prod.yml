@@ -1,6 +1,55 @@
 version: '3.8'
 
 services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-coreshell}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-coreshell_secure_pass_2026}
+      POSTGRES_DB: ${POSTGRES_DB:-coreshell}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-coreshell} -d ${POSTGRES_DB:-coreshell}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--notify-keyspace-events", "Ex"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    expose:
+      - "3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL:-postgres://coreshell:coreshell_secure_pass_2026@postgres:5432/coreshell}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - JWT_SECRET=${JWT_SECRET:-super_secret_coreshell_production_jwt_key}
+    volumes:
+      # Required for the backend to spawn shell sandbox containers
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+
   nginx:
     image: nginx:alpine
     ports:
@@ -13,20 +62,6 @@ services:
       - backend
     restart: unless-stopped
 
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    expose:
-      - "3000"
-    environment:
-      - PORT=3000
-      - NODE_ENV=production
-      # These will be loaded from a .env file in the same directory
-      - DATABASE_URL=${DATABASE_URL}
-      - REDIS_URL=${REDIS_URL}
-      - JWT_SECRET=${JWT_SECRET}
-    volumes:
-      # Required for the backend to spawn shell sandbox containers
-      - /var/run/docker.sock:/var/run/docker.sock
-    restart: unless-stopped
+volumes:
+  postgres_data:
+  redis_data:
