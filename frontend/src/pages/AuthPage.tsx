@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Terminal, Lock, User, ArrowRight, Sparkles, KeyRound } from 'lucide-react';
+import { Terminal, Lock, User, ArrowRight, KeyRound } from 'lucide-react';
 import { Background } from '../components/Background';
 import { Navbar } from '../components/Navbar';
 import './AuthPage.css';
@@ -127,34 +127,22 @@ export const AuthPage: React.FC = () => {
           </form>
 
           <div className="auth-divider">
-            <span>or for evaluation</span>
+            <span>or</span>
           </div>
 
-          <div className="demo-access-card">
-            <div className="demo-badge">
-              <Sparkles size={13} color="#00ffff" />
-              <span>Interviewer & Recruiter Access</span>
-            </div>
-            <div className="demo-credentials">
-              <div className="demo-cred-row">
-                <span className="demo-cred-label">Email:</span>
-                <code>demo@coreshell.dev</code>
-              </div>
-              <div className="demo-cred-row">
-                <span className="demo-cred-label">Password:</span>
-                <code>coreshell_demo</code>
-              </div>
-            </div>
-            <button
-              type="button"
-              className="demo-login-btn"
-              onClick={handleDemoLogin}
-              disabled={loading}
-            >
-              <KeyRound size={16} />
-              <span>One-Click Demo Login</span>
-            </button>
-          </div>
+          <button
+            type="button"
+            className="demo-btn"
+            onClick={handleDemoLogin}
+            disabled={loading}
+          >
+            <KeyRound size={18} className="demo-icon" />
+            <span>Continue with Demo Account</span>
+          </button>
+
+          <p className="demo-hint">
+            Recruiter & Interviewer Access &bull; <code>demo@coreshell.dev</code>
+          </p>
 
           <div className="auth-footer">
             <p>
